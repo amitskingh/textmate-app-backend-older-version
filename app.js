@@ -16,7 +16,7 @@ const authRouter = require("./route/auth.js")
 const authenticateUser = require("./middleware/authentication.js")
 
 app.use(express.json())
-app.use(cors("https://textmate-frontend.onrender.com"))
+app.use(cors())
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/books", authenticateUser, bookRouter)
 app.use("/api/v1/books", authenticateUser, noteRouter)
