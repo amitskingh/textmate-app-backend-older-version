@@ -24,7 +24,7 @@ app.use("/api/v1/books", authenticateUser, noteRouter)
 app.use(notFoundError)
 app.use(errorHandlerMiddleware)
 
-const PORT = process.env.PORT || 3000
+const port = process.env.PORT || 3000
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI)
