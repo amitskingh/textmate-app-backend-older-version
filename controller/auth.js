@@ -8,7 +8,7 @@ const setCookie = (res, token) => {
     expires: expires,
     httpOnly: true,
     secure: true,
-    sameSite: "Strict",
+    sameSite: "none",
     domain: "textmate-backend-uann.onrender.com",
   })
 }
