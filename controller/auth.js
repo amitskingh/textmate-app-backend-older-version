@@ -9,6 +9,7 @@ const setCookie = (res, token) => {
     httpOnly: true,
     secure: true,
     sameSite: "Strict",
+    domain: "textmate-backend-uann.onrender.com",
   })
 }
 
