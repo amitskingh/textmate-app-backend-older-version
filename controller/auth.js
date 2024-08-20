@@ -7,10 +7,9 @@ const setCookie = (res, token) => {
   res.cookie("token", token, {
     expires: expires,
     httpOnly: true,
+    secure: true,
+    sameSite: "Lax",
   })
-  // secure: true,
-  // sameSite: "none",
-  // domain: "https://amitskingh-textmate.netlify.app",
 }
 
 const register = asyncWrapper(async (req, res) => {
