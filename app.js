@@ -12,14 +12,32 @@ const ServerError = require("./errors/server-error.js")
 const errorHandlerMiddleware = require("./middleware/error-handler.js")
 const notFoundError = require("./middleware/not-found.js")
 
+// const corsOptions = {
+//   origin: `${process.env.FRONTEND_URL}`, // Frontend's URL
+//   credentials: true,
+// }
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://textmate-frontend.netlify.app",
+]
+
 const corsOptions = {
-  origin: `${process.env.FRONTEND_URL}`, // Frontend's URL
-  credentials: true,
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
+  },
+  credentials: true, // This allows cookies and other credentials to be sent
+  methods: "GET, POST, PUT, DELETE", // Allowable methods
+  allowedHeaders: "Content-Type, Authorization", // Allowable headers
 }
 
+app.use(cors(corsOptions))
 app.use(helmet())
 app.use(xss())
-app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(express.json())
 
