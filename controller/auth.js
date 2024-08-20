@@ -9,7 +9,7 @@ const setCookie = (res, token) => {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    domain: "textmate-backend-uann.onrender.com",
+    domain: "https://amitskingh-textmate.netlify.app",
   })
 }
 
