@@ -13,7 +13,7 @@ const errorHandlerMiddleware = require("./middleware/error-handler.js")
 const notFoundError = require("./middleware/not-found.js")
 
 const corsOptions = {
-  origin: "http://localhost:5173", // Frontend's URL
+  origin: `${process.env.FRONTEND_URL}`, // Frontend's URL
   credentials: true,
 }
 
@@ -28,7 +28,6 @@ const bookRouter = require("./route/book.js")
 const noteRouter = require("./route/note.js")
 const authRouter = require("./route/auth.js")
 const authenticateUser = require("./middleware/authentication.js")
-
 
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/profile", authenticateUser, authRouter)
