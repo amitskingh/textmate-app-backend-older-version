@@ -17,6 +17,8 @@ const notFoundError = require("./middleware/not-found.js")
 //   credentials: true,
 // }
 
+app.set('trust proxy', true)
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://textmate-frontend.netlify.app",
