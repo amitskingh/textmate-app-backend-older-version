@@ -20,7 +20,7 @@ const notFoundError = require("./middleware/not-found.js")
 const allowedOrigins = [
   "http://localhost:5173",
   "https://textmate-frontend.netlify.app",
-  "https://textmate-frontend-uann.onrender.com",
+  "https://textmate-frontend.onrender.com",
 ]
 
 const corsOptions = {
