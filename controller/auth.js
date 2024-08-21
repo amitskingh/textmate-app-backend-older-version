@@ -8,7 +8,7 @@ const setCookie = (res, token) => {
     expires: expires,
     httpOnly: true,
     secure: true,
-    sameSite: "Lax",
+    sameSite: "none",
   })
 }
 
