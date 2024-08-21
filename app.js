@@ -20,6 +20,7 @@ const notFoundError = require("./middleware/not-found.js")
 const allowedOrigins = [
   "http://localhost:5173",
   "https://textmate-frontend.netlify.app",
+  "https://textmate-frontend-uann.onrender.com",
 ]
 
 const corsOptions = {
@@ -30,9 +31,7 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"))
     }
   },
-  credentials: true, // This allows cookies and other credentials to be sent
-  methods: "GET, POST, PUT, DELETE", // Allowable methods
-  allowedHeaders: "Content-Type, Authorization", // Allowable headers
+  credentials: true,
 }
 
 app.use(cors(corsOptions))
