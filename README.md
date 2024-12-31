@@ -1,216 +1,155 @@
-# **TextMate V-1.0 Backend Architecture**
 
-## **Setup & Configuration**
+---
 
-1. **Installation and Startup**  
-   Run the following commands to set up the project:
+# **Jobs API**
+
+A full-stack job management API designed for posting jobs, applying for jobs, and managing user authentication. It provides RESTful services for job-related operations with secure authentication, validation, and error handling.
+
+---
+
+## **Features**
+
+- **User Authentication**: Register, Login, and JWT-based authentication
+- **Job Management**: Create, Retrieve, and Delete Jobs
+- **Job Applications**: Apply for jobs and manage applications
+- **Error Handling**: Handles validation errors, authentication failures, and more
+- **Security**: Secure API with JWT and CORS configuration
+- **Data Validation**: Ensures correct data input using Mongoose validation
+
+---
+
+## **Installation & Setup**
+
+1. **Clone the Repository**  
+   First, clone the repository to your local machine:
+
    ```bash
-   npm install && npm start
-   ```
-2. **Production Configuration**  
-   Add the following script in the `package.json` file to configure for production:
-
-   ```json
-   "scripts": {
-     "start": "node app.js"
-   }
+   git clone https://github.com/amitskingh/jobs-api.git
+   cd jobs-api
    ```
 
-   By default, the project runs with **nodemon** during development.
+2. **Install Dependencies**  
+   Install all necessary dependencies:
 
-3. **Environment Variables**  
-   Create a `.env` file and include the following environment variables:
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables**  
+   Create a `.env` file in the root directory and add the following variables:
+
    ```env
-   MONGO_URI=<Your MongoDB Connection String>
+   MONGO_URI=<Your MongoDB URI>
    JWT_SECRET=<Your JWT Secret Key>
-   FRONTEND_URL=<Frontend URL>
+   JWT_LIFETIME=<JWT Token Expiration Time, e.g., '1h'>
+   FRONTEND_URL=<Your Frontend URL>
    ```
 
----
-
-## **Database Schema**
-
-### **1. User Schema**
-
-Defines the structure and behavior of the user model, including authentication.
-
-```javascript
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-const mongoose = require("mongoose")
-
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: [true, "Please provide a name"],
-    minlength: 3,
-    maxlength: 50,
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide an email"],
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      "Please provide a valid email",
-    ],
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: 6,
-  },
-})
-
-UserSchema.pre("save", async function () {
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt)
-})
-
-UserSchema.methods.createJWT = function () {
-  return jwt.sign(
-    { userId: this._id, name: this.name },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "15h",
-    }
-  )
-}
-
-UserSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password)
-}
-
-module.exports = mongoose.model("User", UserSchema)
-```
-
----
-
-### **2. Book Schema**
-
-Defines the structure for books created by users.
-
-```javascript
-const mongoose = require("mongoose")
-
-const BookSchema = new mongoose.Schema({
-  subject: {
-    type: String,
-    trim: true,
-    required: [true, "Please provide a subject name"],
-    minlength: 3,
-    maxlength: 50,
-  },
-  createdBy: {
-    type: mongoose.Types.ObjectId,
-    ref: "User",
-    required: [true, "Please provide a user"],
-  },
-})
-
-module.exports = mongoose.model("Book", BookSchema)
-```
-
----
-
-### **3. Note Schema**
-
-Defines the structure for notes associated with books.
-
-```javascript
-const mongoose = require("mongoose")
-
-const NoteSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, "Please provide a title"],
-  },
-  content: {
-    type: String,
-  },
-  createdUnder: {
-    type: mongoose.Types.ObjectId,
-    ref: "Book",
-    required: [true, "Please provide a book reference"],
-  },
-})
-
-module.exports = mongoose.model("Note", NoteSchema)
-```
+4. **Start the Application**  
+   Once the configuration is done, start the application:
+   ```bash
+   npm start
+   ```
 
 ---
 
 ## **API Endpoints**
 
-### **Authentication Routes**
+### **Authentication Endpoints**
 
-- **POST** `/api/v1/auth/register`
-- **POST** `/api/v1/auth/login`
+- **POST** `/api/v1/auth/register`  
+  Register a new user by providing the necessary details (name, email, password).
 
-### **Book Routes** (Protected)
+- **POST** `/api/v1/auth/login`  
+  Log in with an email and password to receive a JWT token for accessing protected resources.
 
-- **GET** `/api/v1/books/` - Retrieve all books for the logged-in user.
-- **POST** `/api/v1/books/` - Create a new book.
-- **DELETE** `/api/v1/books/:bookId` - Delete a specific book.
+### **Job Management Endpoints**
 
-### **Note Routes** (Protected)
+- **GET** `/api/v1/jobs/`  
+  Retrieve all jobs posted by the user.
 
-- **GET** `/api/v1/books/:bookId/notes` - Retrieve all notes under a specific book.
-- **POST** `/api/v1/books/:bookId/notes` - Create a new note under a specific book.
-- **GET** `/api/v1/books/:bookId/notes/:noteId` - Retrieve a specific note.
-- **PUT** `/api/v1/books/:bookId/notes/:noteId` - Update a specific note.
-- **DELETE** `/api/v1/books/:bookId/notes/:noteId` - Delete a specific note.
+- **POST** `/api/v1/jobs/`  
+  Create a new job by providing the job details like title, company, location, etc.
 
----
+- **DELETE** `/api/v1/jobs/:id`  
+  Delete a specific job by providing the job ID.
 
-## **Authentication Middleware**
+### **Job Application Endpoints**
 
-Secure API access using both **Bearer tokens** and **cookies**:
-
-```javascript
-const jwt = require("jsonwebtoken")
-const { UnauthenticatedError } = require("../errors")
-
-const auth = async (req, res, next) => {
-  const token =
-    req.cookies?.token || req.headers.authorization?.replace("Bearer ", "")
-
-  if (!token) throw new UnauthenticatedError("Access denied, please login")
-
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = { userId: payload.userId, name: payload.name }
-    next()
-  } catch (error) {
-    throw new UnauthenticatedError("Authentication invalid")
-  }
-}
-
-module.exports = auth
-```
+- **POST** `/api/v1/applications/`  
+  Apply for a job by submitting the job ID and your application details.
 
 ---
 
-## **CORS Configuration**
+## **Models**
 
-Supports cross-origin requests with credentials:
+### **User Model**
 
-```javascript
-const corsOptions = {
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-}
+- **Email**: Unique email for authentication
+- **Password**: Encrypted password using bcrypt
+- **JWT**: Used for generating JSON Web Tokens upon login
 
-module.exports = corsOptions
-```
+### **Job Model**
 
-## **Features**
+- **Title**: The job title (e.g., "Software Engineer")
+- **Company**: The company offering the job
+- **Location**: The location of the job
+- **CreatedBy**: Reference to the user who created the job post
 
-1. **User Authentication**: Secure login, registration, and token validation.
-2. **Books and Notes Management**: CRUD operations for books and their associated notes.
-3. **Access Control**: Ensures only the owner can access their resources.
-4. **CORS Support**: Handles cross-origin requests with credential support.
-5. **Flexible Authentication**: Accepts tokens via headers or cookies.
+### **Application Model**
+
+- **Job**: Reference to the job being applied for
+- **User**: Reference to the user who applied for the job
+- **Status**: The status of the application (e.g., "Applied", "Interviewed")
 
 ---
+
+## **Security**
+
+- **JWT Authentication**: Protects all routes except the ones related to registration and login.
+- **CORS**: Configured to allow cross-origin requests from a specific frontend URL.
+- **Helmet**: Sets various HTTP headers to enhance API security.
+
+---
+
+## **Dependencies**
+
+This project uses the following dependencies:
+
+- **express**: Web framework for Node.js
+- **mongoose**: MongoDB object modeling
+- **bcryptjs**: For password hashing
+- **jsonwebtoken**: For JWT authentication
+- **dotenv**: Loads environment variables from `.env`
+- **cors**: Middleware to handle cross-origin requests
+- **helmet**: Security middleware to set HTTP headers
+
+---
+
+## **Contributing**
+
+We welcome contributions! If you would like to contribute to this project, please fork the repository and submit a pull request. Be sure to follow these steps:
+
+1. Fork the repository
+2. Create a new branch
+3. Make your changes
+4. Commit your changes
+5. Push to your forked repository
+6. Open a pull request with a description of the changes
+
+---
+
+## **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## **Author**
+
+- **Amit Singh**  
+  GitHub: [@amitskingh](https://github.com/amitskingh)
+
+---
+
+This version gives a more comprehensive overview, detailing setup, API endpoints, models, security considerations, and other essential information. Let me know if this is better or if you'd like any adjustments!
