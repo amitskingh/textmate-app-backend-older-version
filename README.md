@@ -25,6 +25,7 @@
    JWT_SECRET=<Your JWT Secret Key>
    FRONTEND_URL=<Frontend URL>
    ```
+4. For the frontend setup and instructions, visit [TextMate Frontend Older](https://github.com/amitskingh/textmate-app-older-version).
 
 ---
 
